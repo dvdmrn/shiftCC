@@ -15,7 +15,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(__file__)+'\modules\mp3play-0.1.15')
-#import mp3play
+import mp3play
 import re
 
 dmin=0 #difference in minutes
@@ -27,8 +27,8 @@ invalid = True
 
 
 def main():
-#	clip = mp3play.load(r'AAOCGmIRC6.mp3')
-#	clip.play()
+	clip = mp3play.load(r'AAOCGmIRC6.mp3')
+	clip.play()
 
 	print "___ __           __    __      __   ___ __      __ \n | |_  /\ |\/|  (_ \_/|__)/  \|__)   | |__) /\ |__)\n | |__/--\|  |  __) | | \ \__/|      | | \ /--\|   \n *~AUTOMATIC DISCRETE LINEAR CLOSED CAPTIONING DIFFERNCE ENGINE~*\n v.0.1337\n[press enter]"
 	raw_input()
@@ -87,7 +87,7 @@ def readFile(file_name):
 		fp = raw_input('Invalid file path, try again. (Make sure you include the .sbv extension!):\n')
 		readFile(fp)
 	else:
-		raw_input('it worked!')
+		print "file opened!"
 	lines = file1.readlines()
 	file2 = open(file_name+'_processed.sbv', 'w')
 	print "writing new file:"+file_name+'_processed\n'
@@ -124,7 +124,7 @@ def readFile(file_name):
 			file2.write(line+'\n')
 	file1.close()
 	file2.close()
-	print "Complete! A new file has been written in the same folder that contained your old file!\nHave a great day!"
+	print "Complete!\n A new file has been written in the same folder that contained your old file!\n\nHave a great day!"
 	raw_input()
 
 def subtractSeconds(t, s):
