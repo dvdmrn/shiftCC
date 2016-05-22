@@ -17,7 +17,7 @@ import os
 
 import re
 	
-import pyglet
+import pygame
 
 
 
@@ -34,10 +34,11 @@ invalid = True
 secondsAcc = 0 #an accumulator for how many seconds to add/subtract
 
 def main():
-
-	music = pyglet.resource.media('AAOCGmIRC6.wav')
-	music.play()
-
+	file = 'AAOCGmIRC6.mp3'
+	pygame.init()
+	pygame.mixer.init()
+	pygame.mixer.music.load(file)
+	pygame.mixer.music.play()
 
 
 	print "___ __           __    __      __   ___ __      __ \n | |_  /\ |\/|  (_ \_/|__)/  \|__)   | |__) /\ |__)\n | |__/--\|  |  __) | | \ \__/|      | | \ /--\|   \n *~AUTOMATIC DISCRETE LINEAR CLOSED CAPTIONING DIFFERNCE ENGINE~*\n v.0.1337\n[press enter]"
