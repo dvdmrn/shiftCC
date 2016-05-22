@@ -14,9 +14,15 @@
 
 import sys
 import os
-sys.path.append(os.path.dirname(__file__)+'\modules')
-import mp3play
+
 import re
+	
+import pyglet
+
+
+
+
+
 
 dmin=0 #difference in minutes
 dsec=0 #difference in seconds
@@ -28,8 +34,11 @@ invalid = True
 secondsAcc = 0 #an accumulator for how many seconds to add/subtract
 
 def main():
-	clip = mp3play.load(r'AAOCGmIRC6.mp3')
-	clip.play()
+
+	music = pyglet.resource.media('AAOCGmIRC6.wav')
+	music.play()
+
+
 
 	print "___ __           __    __      __   ___ __      __ \n | |_  /\ |\/|  (_ \_/|__)/  \|__)   | |__) /\ |__)\n | |__/--\|  |  __) | | \ \__/|      | | \ /--\|   \n *~AUTOMATIC DISCRETE LINEAR CLOSED CAPTIONING DIFFERNCE ENGINE~*\n v.0.1337\n[press enter]"
 	raw_input()
