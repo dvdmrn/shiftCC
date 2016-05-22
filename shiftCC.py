@@ -19,7 +19,7 @@ import mp3play
 import re
 
 dmin=0 #difference in minutes
-dsec=1 #difference in seconds
+dsec=0 #difference in seconds
 dmsec=0 #difference in ms
 TCminutes = 0 #time code for minutes
 TCseconds = 0 #time code for seconds
@@ -142,32 +142,27 @@ def readFile(file_name):
 			global TCminutes
 			global TCseconds
 			global TCmilliseconds
-			global secondsAcc
-
-			difference = (dsec+(dmin*60)) #the total amount of seconds we want to subtract
-
-		
+			global secondsAcc #!!! delete?
+			difference = (dmsec+(dsec*1000)+(dmin*60000)) #the total amount of seconds we want to subtract!!! delete?
 			#parses in point
-			
 			TCminutes = int(line[2:4])
 			TCseconds = int(line[5:7])
 			TCmilliseconds = int(line[8:11])
-			calculateMs(dmsec) #calculates the diff in ms
-			currentTimeS = TCseconds+(TCminutes*60) #current time in seconds
-			subtractSeconds(currentTimeS, difference)
+
+			currentTimeMs = TCmilliseconds+(TCseconds*1000)+(TCminutes*60000) #current time in milliseconds
+			calculateTime(currentTimeMs, difference)
 			line = line[:2]+str(TCminutes)+line[4:]
 			line = line[:5]+str(TCseconds)+line[7:]
-			print "Computed TCmilliseconds: "+str(TCmilliseconds)
 			line = line[:8]+str(TCmilliseconds)+line[11:]
-			secondsAcc=0 #resets secondsAcc for next timecode
+			secondsAcc=0 #resets secondsAcc for next timecode #!!!not rly using secondsAcc
 			
 			#parses out point
 			TCminutes = int(line[14:16]) #!!!This is where it blows up
 			TCseconds = int(line[17:19])
 			TCmilliseconds = int(line[20:23])
-			calculateMs(dmsec) #calculates the diff in ms
-			currentTimeS = TCseconds+(TCminutes*60) #current time in seconds
-			subtractSeconds(currentTimeS, difference)
+
+			currentTimeMs = TCmilliseconds + (TCseconds * 1000) + (TCminutes * 60000)  # current time in milliseconds
+			calculateTime(currentTimeMs, difference)
 			line = line[:14]+str(TCminutes)+line[16:]
 			line = line[:17]+str(TCseconds)+line[19:]
 			line = line[:20]+str(TCmilliseconds)+line[23:]
@@ -184,20 +179,32 @@ def readFile(file_name):
 	raw_input()
 	exit()
 
-def subtractSeconds(t, s):
+def calculateTime(t, ds):
 	global TCminutes
 	global TCseconds
-	if ((t+s)<=0): #if we subtract past the start of the video we want our TC to read: 00:00:000
+	global TCmilliseconds
+	if ((t+ds)<=0): #if we subtract past the start of the video we want our TC to read: 00:00:000
 		TCminutes="00"
 		TCseconds="00"
 		TCmilliseconds="000"
-		
 
 	else:
-		newTime = t+s #the new time in seconds. Should be a positive int.
-		TCminutes = newTime/60 #discerns how many minutes that is
-		TCseconds = newTime-(TCminutes*60) #subtracts that
-		TCseconds = TCseconds+secondsAcc #the carry from ms
+		newTime = t + ds #the new time in seconds. Should be a positive int.
+		if ((newTime>=6000)or(newTime<=6000)):
+			TCminutes = newTime/60000 #discerns how many minutes that is
+			newTime = newTime - (TCminutes * 60000)  # sets newTime to whatever's leftover from taking out mins.
+		if ((newTime>=1000)or(newTime<=1000)):
+			TCseconds = newTime/1000 #how many seconds is leftover?
+			newTime = newTime -(TCseconds*1000) #subtracts that
+			print "lol sup"
+		TCmilliseconds = newTime #the remainder is our difference in ms.
+		if (TCmilliseconds<999):
+			if(TCmilliseconds<=0):
+				TCmilliseconds='000'
+			elif(TCmilliseconds<10):
+				TCmilliseconds ='00'+str(TCmilliseconds)
+			elif(TCmilliseconds<100):
+				TCmilliseconds='0'+str(TCmilliseconds)
 		if (TCseconds<10):
 			if(TCseconds<=0):
 				TCseconds = '00'
@@ -208,59 +215,5 @@ def subtractSeconds(t, s):
 				TCminutes = '00'
 			else:
 				TCminutes = '0'+str(TCminutes)
-		
-def calculateMs(n):
-	newMs = TCmilliseconds+n
-	print "newMs printout: "+str(newMs)
-	#do we need to add or subtract seconds?
-	if(newMs<0):
-		subtractMs(newMs)
-	if(newMs>999):
-		addMs(newMs)
-	elif (n<0):
-		subtractMs(newMs)
-	elif (n>=0):
-		addMs(newMs)
-	elif (newMs==0):
-		TCmilliseconds == '000'
-
-def subtractMs(msInput):
-	global secondsAcc
-	global TCmilliseconds
-
-	while (msInput<0):
-		print "in while loop"
-		msInput = 1000 + msInput #we're adding because msInput is negative.
-		secondsAcc -= 1
-
-	
-	if(msInput==0):
-		TCmilliseconds = "000"
-	if(msInput>-10):
-		TCmilliseconds = "00"+str(msInput)
-	if(msInput>-100):
-		TCmilliseconds = "0"+str(msInput)
-	else:
-		TCmilliseconds = msInput
-
-def addMs(msInput):
-	global secondsAcc
-	global TCmilliseconds
-	print "TCmilliseconds in addms!: "+str(TCmilliseconds)
-	
-	while (msInput>999):
-		print "in while loop"
-		msInput = msInput-1000
-		secondsAcc += 1
-
-	if(msInput==0):
-		TCmilliseconds = "000"
-	if(msInput<10):
-		TCmilliseconds = "00"+str(msInput)
-	if(msInput<100):
-		TCmilliseconds = "0"+str(msInput)
-	else:
-		TCmilliseconds = str(msInput)
-
 
 main()
